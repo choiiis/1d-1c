@@ -8,22 +8,28 @@ int R, C;
 int dx[4] = { 1, 0, 0, -1 };
 int dy[4] = { 0, 1, -1, 0 };
 
-bool visited[51][51] = { false, };
-bool waterVisited[51][51] = { false, };
-int waterTime[51][51] = { 0 };
-int hedgeTime[51][51] = { 0 };
-char map[51][51] = { 0 };
+int waterTime[51][51] = { 0, };
+int hedgeTime[51][51] = { 0, };
+char map[51][51] = { 0, };
 
 pair<int, int> start;
 pair<int, int> finish;
 queue<pair<int, int>> water;
 
 int BFS(void) {
+    for (int i = 0; i < R; i++) {
+        for (int j = 0; j < C; j++) {
+            waterTime[i][j] = -1;
+        }
+    }
     queue<pair<int, int>> pos;
     pair<int, int> cur;
     pair<int, int> next;
     
     pos.push(make_pair(start.first, start.second));
+    hedgeTime[start.first][start.second] = 0;
+    if(!water.empty())
+        waterTime[water.front().first][water.front().second] = 0;
 
     while (!water.empty()) {
         cur = water.front();
@@ -31,10 +37,12 @@ int BFS(void) {
         for (int i = 0; i < 4; i++) {
             next = make_pair(cur.first + dx[i], cur.second + dy[i]);
             if (0 <= next.first && next.first < R && 0 <= next.second && next.second < C) {
-                if (map[next.first][next.second] == '.' && waterVisited[next.first][next.second] == false) {
-                    water.push(make_pair(next.first, next.second));
-                    waterVisited[next.first][next.second] = true;
-                    waterTime[next.first][next.second] += 1;
+                if (map[next.first][next.second] != '*' && map[next.first][next.second] != 'D' && map[next.first][next.second] != 'X') {
+                    if (waterTime[next.first][next.second] == -1) {
+                        water.push(make_pair(next.first, next.second));
+                        waterTime[next.first][next.second] = waterTime[cur.first][cur.second] + 1;
+                    }
+                    
                 }
             }
         }
@@ -49,18 +57,16 @@ int BFS(void) {
                 return hedgeTime[cur.first][cur.second] + 1;
             }
             else if (0 <= next.first && next.first < R && 0 <= next.second && next.second < C) {
-                if (map[next.first][next.second] == '.') {
-                    if (hedgeTime[cur.first][cur.second] + 1 == waterTime[next.first][next.second]) {
-                        cout << "in" << endl;
+                if (map[next.first][next.second] == '.'&& hedgeTime[next.first][next.second] == 0) {
+                    if (hedgeTime[cur.first][cur.second] + 1 != waterTime[next.first][next.second]) {
                         pos.push(make_pair(next.first, next.second));
-                        visited[next.first][next.second] = true;
-                        hedgeTime[next.first][next.second] += 1;
+                        hedgeTime[next.first][next.second] = hedgeTime[cur.first][cur.second] + 1;
                     }
                 }
             }
         }
-        return -1;
     }
+    return -1;
 }
 
 int main(void) {
@@ -93,6 +99,5 @@ int main(void) {
     else {
         cout << res;
     }
-
     return 0;
 }

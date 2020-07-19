@@ -58,7 +58,7 @@ int BFS(void) {
             }
             else if (0 <= next.first && next.first < R && 0 <= next.second && next.second < C) {
                 if (map[next.first][next.second] == '.'&& hedgeTime[next.first][next.second] == 0) {
-                    if (hedgeTime[cur.first][cur.second] + 1 != waterTime[next.first][next.second]) {
+                    if (hedgeTime[cur.first][cur.second] + 1 < waterTime[next.first][next.second] || waterTime[next.first][next.second] == -1) {
                         pos.push(make_pair(next.first, next.second));
                         hedgeTime[next.first][next.second] = hedgeTime[cur.first][cur.second] + 1;
                     }
